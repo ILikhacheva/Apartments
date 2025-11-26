@@ -117,3 +117,53 @@ app.post("/add-apart-full", upload.single("AddFile"), async (req, res) => {
     client.release();
   }
 });
+
+app.get("/apartments", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT apart_id, apart_address, apart_name FROM apartments"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// Добавить сотрудника
+// Add employee (POST /add-em-full)
+app.post("/add-em-full", upload.single("AddEmFile"), async (req, res) => {
+  const { person_name, person_discr, phone } = req.body;
+  const file = req.file;
+  if (!file || !person_name || !person_discr || !phone) {
+    return res.status(400).json({ error: "Invalid data" });
+  }
+  const fileName = file.filename;
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    // Вставляем работника
+    const insQ = await client.query(
+      "INSERT INTO about(person_name, person_discr, phone, photo_name) VALUES ($1, $2, $3, $4) RETURNING person_id",
+      [person_name, person_discr, phone, fileName]
+    );
+    await client.query("COMMIT");
+    res.json({ success: true, personId: insQ.rows[0].person_id });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("DB ERROR /add-em-full:", err);
+    res.status(500).json({ error: "Database error" });
+  } finally {
+    client.release();
+  }
+});
+
+app.get("/about", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT person_id, person_name, person_discr, phone, photo_name FROM about"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "DB error" });
+  }
+});

@@ -50,6 +50,20 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Sign-in/sign-out logic
+
+function updateAddEmployeeButton() {
+  const addEmBtn = document.getElementById("add-em-btn");
+  if (!addEmBtn) return;
+  if (
+    typeof ApartState !== "undefined" &&
+    ApartState.email &&
+    ApartState.email.trim().length > 0
+  ) {
+    addEmBtn.style.display = "inline-block";
+  } else {
+    addEmBtn.style.display = "none";
+  }
+}
 function updateAddApartButton() {
   const addApartBtn = document.getElementById("add-apart-btn");
   if (!addApartBtn) return;
@@ -128,6 +142,7 @@ if (signInForm) {
       console.log("Logged in as:", ApartState.email);
       updateSignInButton();
       updateAddApartButton();
+      updateAddEmployeeButton();
       alert("Welcome, " + email + "!");
     } catch (e) {
       err.textContent = "Server error";
@@ -150,12 +165,13 @@ if (addApartBtn) {
   addApartBtn.addEventListener("click", openAddModal);
 }
 // Показываем кнопку при загрузке страницы
+// Show the button when the page loads
 updateAddApartButton();
 
 // Add apart form submit
-const addForm = document.getElementById("AddForm");
-if (addForm) {
-  addForm.addEventListener("submit", async function (e) {
+const addApartForm = document.getElementById("AddForm");
+if (addApartForm) {
+  addApartForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     const AddApart = document.getElementById("AddApart").value.trim();
     const AddFileInput = document.getElementById("AddFile");
@@ -181,8 +197,95 @@ if (addForm) {
         return;
       }
       errorDiv.style.display = "none";
-      addForm.reset();
+      addApartForm.reset();
       alert("Apartment added!");
+      closeAddModal();
+    } catch (e) {
+      errorDiv.textContent = "Server error";
+      errorDiv.style.display = "block";
+    }
+  });
+}
+
+// Load and display apartments
+async function loadApartments() {
+  const container = document.querySelector("#apartments-list");
+  container.innerHTML = "";
+  const res = await fetch("/apartments");
+  const apartments = await res.json();
+  apartments.forEach((apart) => {
+    const card = document.createElement("div");
+    card.className = "col-md-3 col-sm-6 mb-4";
+    card.innerHTML = `
+      <div class="card h-100 position-relative overflow-hidden">
+        <div class="apartment-label">${apart.apart_address}</div>
+        <img src="/uploads/${apart.apart_name}" class="card-img-top" alt="${apart.apart_address}">
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+document.addEventListener("DOMContentLoaded", loadApartments);
+
+// Add employee modal logic
+const addEmBtn = document.getElementById("add-em-btn");
+const addEmOverlay = document.getElementById("AddEmOverlay");
+function openAddEmModal() {
+  if (addEmOverlay) addEmOverlay.style.display = "flex";
+  else alert("Add employee modal not implemented yet!");
+}
+function closeAddEmModal() {
+  if (addEmOverlay) addEmOverlay.style.display = "none";
+}
+window.closeAddEmModal = closeAddEmModal;
+if (addEmBtn) {
+  addEmBtn.addEventListener("click", openAddEmModal);
+}
+// Показываем кнопку при загрузке страницы
+// Show the button when the page loads
+updateAddEmployeeButton();
+
+// Add employee form submit
+const addEmForm = document.getElementById("AddEmForm");
+if (addEmForm) {
+  addEmForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const person_name = document.getElementById("AddName").value.trim();
+    const person_discr = document.getElementById("AddDescription").value.trim();
+    const phone = document.getElementById("AddPhone").value.trim();
+    const AddEmFileInput = document.getElementById("AddEmFile");
+    const errorDiv = document.getElementById("AddEmError");
+    errorDiv.style.display = "none";
+    if (
+      !AddEmFileInput.files.length ||
+      !person_name ||
+      !person_discr ||
+      !phone
+    ) {
+      errorDiv.textContent = "Fill in all fields";
+      errorDiv.style.display = "block";
+      return;
+    }
+    const formData = new FormData();
+    formData.append("person_name", person_name);
+    formData.append("person_discr", person_discr);
+    formData.append("phone", phone);
+    formData.append("AddEmFile", AddEmFileInput.files[0]);
+
+    try {
+      const res = await fetch("/add-em-full", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        errorDiv.textContent = data.error || "Error saving apartment";
+        errorDiv.style.display = "block";
+        return;
+      }
+      errorDiv.style.display = "none";
+      addEmForm.reset();
+      alert("Employee added!");
       closeAddModal();
     } catch (e) {
       errorDiv.textContent = "Server error";

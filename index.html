@@ -25,6 +25,13 @@
           >
             Add apart
           </button>
+          <button
+            id="add-em-btn"
+            class="btn btn-primary"
+            style="display: none"
+          >
+            Add employee
+          </button>
       </div>
     </nav>
 
@@ -41,33 +48,10 @@
     <!-- Asuntolat -->
     <div id="asunnot" class="container py-4">
       <h2 class="border-bottom mb-4">Asuntolat</h2>
-      <div class="row">
-        <div class="col-md-3 col-sm-6 mb-4">
-          <div class="card h-100 position-relative overflow-hidden">
-            <div class="apartment-label">Metsänkatu 5</div>
-            <img src="asunto_2.jpg" class="card-img-top" alt="Metsänkatu 5">
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-4">
-          <div class="card h-100 position-relative overflow-hidden">
-            <div class="apartment-label">Taikuritie 17</div>
-            <img src="asunto_1.jpg" class="card-img-top" alt="Taikuritie 17">
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-4">
-          <div class="card h-100 position-relative overflow-hidden">
-            <div class="apartment-label">Noitankuja 7</div>
-            <img src="asunto_4.jpg" class="card-img-top" alt="Noitankuja 7">
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-4">
-          <div class="card h-100 position-relative overflow-hidden">
-            <div class="apartment-label">Talvipolku 20</div>
-            <img src="asunto_3.png" class="card-img-top" alt="Talvipolku 20">
-          </div>
-        </div>
+      <div class="row" id="apartments-list">
       </div>
     </div>
+  </div>
 
 
 <!-- Meistä -->
@@ -233,6 +217,87 @@
           </div>
           <div
             id="AddError"
+            style="
+              color: red;
+              display: none;
+              margin-bottom: 8px;
+              font-size: 14px;
+            "
+          ></div>
+          <div
+            class="buttons"
+            style="display: flex; gap: 12px; align-items: center"
+          >
+            <button type="submit" class="btn btn-primary">Add</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeAddEmModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+   <!--Модальное окно для добавления сотрудников-->
+    <!--Modal window for adding employees-->
+
+    <div id="AddEmOverlay" class="modal-overlay" style="display: none">
+      <div
+        id="AddEmModal"
+        class="modal-window"
+        style="min-width: 340px; max-width: 95vw"
+      >
+        <button class="close-btn" onclick="closeAddEmModal()" title="Close">
+          ×
+        </button>
+        <h2>Add employee</h2>
+        <form id="AddEmForm" method="post" action="#">
+          <div class="form-group">
+            <input
+              type="text"
+              id="AddName"
+              name="AddName"
+              placeholder="Employee name"
+              required
+              style="width: 100%; padding: 8px; font-size: 16px"
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="AddDescription"
+              name="AddDescription"
+              placeholder="Employee description"
+              required
+              style="width: 100%; padding: 8px; font-size: 16px"
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="AddPhone"
+              name="AddPhone"
+              placeholder="Employee phone"
+              required
+              style="width: 100%; padding: 8px; font-size: 16px"
+            />
+          </div>                  
+          <div class="form-group">
+            <input
+              type="file"
+              id="AddEmFile"
+              name="AddEmFile"
+              placeholder="File name"
+              required
+              style="width: 100%; padding: 8px; font-size: 16px"
+            />
+          </div>
+          <div
+            id="AddEmError"
             style="
               color: red;
               display: none;

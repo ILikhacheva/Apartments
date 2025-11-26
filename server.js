@@ -8,6 +8,8 @@ const express = require("express");
 const bcrypt = require("bcrypt"); // Для хеширования паролей / For password hashing
 const cors = require("cors"); // Для кросс-доменных запросов / For cross-origin requests
 const { Pool } = require("pg"); // PostgreSQL клиент / PostgreSQL client
+const multer = require("multer"); // Для загрузки файлов
+const path = require("path");
 const app = express(); // Экземпляр приложения Express / Express app instance
 
 // Настраиваем CORS для разрешения кросс-доменных запросов
@@ -21,6 +23,7 @@ app.use(
 // Подключаем обслуживание статических файлов из текущей директории
 // Serve static files from current directory
 app.use(express.static(__dirname));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Подключаем middleware для парсинга JSON в запросах
 // Attach middleware for parsing JSON in requests
@@ -28,6 +31,17 @@ app.use(express.json());
 
 // Создаем пул подключений к PostgreSQL базе данных
 // Create a connection pool to PostgreSQL database
+// Настройка multer для загрузки файлов
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "uploads"));
+  },
+  filename: function (req, file, cb) {
+    // Сохраняем оригинальное имя файла
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
+const upload = multer({ storage });
 const pool = new Pool({
   host: process.env.DB_HOST || "localhost",
   port: process.env.DB_PORT || 5432,
@@ -78,19 +92,20 @@ app.post("/login", async (req, res) => {
 
 // Добавить квартиру
 // Add apart (POST /add-apart-full)
-app.post("/add-apart-full", async (req, res) => {
-  const { AddApart, AddFile } = req.body;
-  if (!AddFile || !AddApart) {
+app.post("/add-apart-full", upload.single("AddFile"), async (req, res) => {
+  const { AddApart } = req.body;
+  const file = req.file;
+  if (!file || !AddApart) {
     return res.status(400).json({ error: "Invalid data" });
   }
+  const fileName = file.filename;
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
     // Вставляем квартиру
-    // Insert the apartment
     const insQ = await client.query(
-      "INSERT INTO apartments (apart_name, apart_address) VALUES ($1, $2) RETURNING apart_id",
-      [AddApart, AddFile]
+      "INSERT INTO apartments (apart_address, apart_name) VALUES ($1, $2) RETURNING apart_id",
+      [AddApart, fileName]
     );
     await client.query("COMMIT");
     res.json({ success: true, apartId: insQ.rows[0].apart_id });

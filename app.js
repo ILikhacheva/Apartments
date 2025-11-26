@@ -50,15 +50,28 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Sign-in/sign-out logic
-let newsState = { email: "" };
+function updateAddApartButton() {
+  const addApartBtn = document.getElementById("add-apart-btn");
+  if (!addApartBtn) return;
+  if (
+    typeof ApartState !== "undefined" &&
+    ApartState.email &&
+    ApartState.email.trim().length > 0
+  ) {
+    addApartBtn.style.display = "inline-block";
+  } else {
+    addApartBtn.style.display = "none";
+  }
+}
+let ApartState = { email: "" };
 const signInBtn = document.getElementById("sign-in-btn");
 const signInOverlay = document.getElementById("SignInModalOverlay");
 function updateSignInButton() {
   if (!signInBtn) return;
   if (
-    typeof newsState !== "undefined" &&
-    newsState.email &&
-    newsState.email.trim().length > 0
+    typeof ApartState !== "undefined" &&
+    ApartState.email &&
+    ApartState.email.trim().length > 0
   ) {
     signInBtn.textContent = "Sign out";
   } else {
@@ -75,15 +88,15 @@ window.closeSignInModal = closeSignInModal;
 if (signInBtn) {
   signInBtn.addEventListener("click", function () {
     if (
-      typeof newsState === "undefined" ||
-      !newsState.email ||
-      newsState.email.trim().length === 0
+      typeof ApartState === "undefined" ||
+      !ApartState.email ||
+      ApartState.email.trim().length === 0
     ) {
       openSignInModal();
     } else {
-      newsState.email = "";
+      ApartState.email = "";
       updateSignInButton();
-      if (typeof updateAddNewsButton === "function") updateAddNewsButton();
+      if (typeof updateAddApartButton === "function") updateAddApartButton();
     }
   });
 }
@@ -111,9 +124,10 @@ if (signInForm) {
         return;
       }
       closeSignInModal();
-      newsState.email = email;
+      ApartState.email = email;
+      console.log("Logged in as:", ApartState.email);
       updateSignInButton();
-      updateAddNewsButton();
+      updateAddApartButton();
       alert("Welcome, " + email + "!");
     } catch (e) {
       err.textContent = "Server error";
@@ -122,32 +136,47 @@ if (signInForm) {
   });
 }
 
-// Add news form submit
+// Add apart modal logic
+const addApartBtn = document.getElementById("add-apart-btn");
+const addApartOverlay = document.getElementById("AddApartOverlay");
+function openAddModal() {
+  if (addApartOverlay) addApartOverlay.style.display = "flex";
+}
+function closeAddModal() {
+  if (addApartOverlay) addApartOverlay.style.display = "none";
+}
+window.closeAddModal = closeAddModal;
+if (addApartBtn) {
+  addApartBtn.addEventListener("click", openAddModal);
+}
+// Показываем кнопку при загрузке страницы
+updateAddApartButton();
+
+// Add apart form submit
 const addForm = document.getElementById("AddForm");
 if (addForm) {
   addForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     const AddApart = document.getElementById("AddApart").value.trim();
-    const AddFile = document.getElementById("AddFile").value.trim();
+    const AddFileInput = document.getElementById("AddFile");
     const errorDiv = document.getElementById("AddError");
     errorDiv.style.display = "none";
-    if (!AddFile || !AddApart) {
+    if (!AddFileInput.files.length || !AddApart) {
       errorDiv.textContent = "Fill in all fields";
       errorDiv.style.display = "block";
       return;
     }
+    const formData = new FormData();
+    formData.append("AddApart", AddApart);
+    formData.append("AddFile", AddFileInput.files[0]);
     try {
       const res = await fetch("/add-apart-full", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          AddApart,
-          AddFile,
-        }),
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        errorDiv.textContent = data.error || "Error saving news";
+        errorDiv.textContent = data.error || "Error saving apartment";
         errorDiv.style.display = "block";
         return;
       }

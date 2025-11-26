@@ -1,0 +1,125 @@
+.main-image-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.main-image {
+  width: 100%;
+  height: 320px; /*  .card-img-top */
+  object-fit: cover;
+  display: block;
+}
+
+.main-image-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.main-title {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 24px 48px;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.apartment-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 8px 18px 8px 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-bottom-right-radius: 12px;
+  z-index: 2;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.card-img-top {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.modal-window select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+.modal-window {
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+}
+.close-btn:hover {
+  color: #222;
+}
+.modal-window h2 {
+  text-align: center;
+  color: #ccc;
+  margin-bottom: 24px;
+}
+/* Input fields in modal windows */
+.modal-window input[type="email"],
+.modal-window input[type="password"],
+.modal-window input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+/* Center modal overlay and window */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
+.modal-overlay[style*="display: flex"] {
+  display: flex !important;
+}
+.modal-window {
+  margin: auto;
+  box-shadow: 0 4px 32px rgba(193, 189, 189, 0.7);
+  border-radius: 12px;
+  min-width: 380px;
+  max-width: 98vw;
+  padding: 32px 28px;
+}

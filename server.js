@@ -38,6 +38,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // Сохраняем оригинальное имя файла
+    // Save original file name
     cb(null, Date.now() + "_" + file.originalname);
   },
 });
@@ -103,6 +104,7 @@ app.post("/add-apart-full", upload.single("AddFile"), async (req, res) => {
   try {
     await client.query("BEGIN");
     // Вставляем квартиру
+    // Insert apart
     const insQ = await client.query(
       "INSERT INTO apartments (apart_address, apart_name) VALUES ($1, $2) RETURNING apart_id",
       [AddApart, fileName]
@@ -142,6 +144,7 @@ app.post("/add-em-full", upload.single("AddEmFile"), async (req, res) => {
   try {
     await client.query("BEGIN");
     // Вставляем работника
+    // Insert employee
     const insQ = await client.query(
       "INSERT INTO about(person_name, person_discr, phone, photo_name) VALUES ($1, $2, $3, $4) RETURNING person_id",
       [person_name, person_discr, phone, fileName]

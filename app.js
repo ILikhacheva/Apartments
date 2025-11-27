@@ -293,3 +293,24 @@ if (addEmForm) {
     }
   });
 }
+
+// Load and display employees
+async function loadEmployees() {
+  const container = document.getElementById("employees-list");
+  if (!container) return;
+  container.innerHTML = "";
+  const res = await fetch("/about");
+  const employees = await res.json();
+  employees.forEach((emp) => {
+    const card = document.createElement("div");
+    card.className = "col-md-4 col-sm-6 mb-4 text-center";
+    card.innerHTML = `
+        <img src="/uploads/${emp.photo_name}" alt="${emp.person_name}" class="employee-photo">
+        <h3>${emp.person_name}</h3>
+        <p class="text-muted">${emp.person_discr}</p>
+        <button class="btn btn-light w-100 btn-contact" data-phone="${emp.phone}" data-name="${emp.person_name}">Contact</button>
+      `;
+    container.appendChild(card);
+  });
+}
+document.addEventListener("DOMContentLoaded", loadEmployees);

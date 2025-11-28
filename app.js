@@ -224,6 +224,18 @@ async function loadApartments() {
     `;
     container.appendChild(card);
   });
+  // Назначаем обработчик клика на все .card-img-top
+  // Assign click handler to all .card-img-top
+  container.querySelectorAll(".card-img-top").forEach(function (img) {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", function () {
+      var modalImg = document.getElementById("modalImg");
+      modalImg.src = img.src;
+      modalImg.alt = img.alt;
+      var modal = new bootstrap.Modal(document.getElementById("imageModal"));
+      modal.show();
+    });
+  });
 }
 document.addEventListener("DOMContentLoaded", loadApartments);
 
